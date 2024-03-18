@@ -12,39 +12,23 @@ jobs:
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v2
-
-    - name: Display the current README contents
-      run: cat README.md
-
+      
     - name: Update README.md
       run: |
-        # Print the current UNIX timestamp, for diagnostic purposes
+        # Print the current UNIX timestamp for diagnostic purposes
         echo "Current UNIX timestamp: $(date +%s)"
         # Generate a unique query string using the current UNIX timestamp
         UNIQUE_STRING=$(date +%s)
-        # Update the README.md file with the new query string
-        sed -i "s/Robinzor.png\?v=[0-9]*/Robinzor.png?v=${UNIQUE_STRING}/" README.md
-        # Print the modified README contents, to verify the sed operation
+        # Correctly update the README.md file with the new query string for the badge URL
+        sed -i "s/Robinzor.png\?version=[0-9]*/Robinzor.png?version=${UNIQUE_STRING}/" README.md
+        # Print the modified README contents to verify the sed operation
         echo "Modified README.md contents:"
         cat README.md
-
-    - name: Prepare for commit
+        
+    - name: Commit and push if changes are detected
       run: |
         git config --global user.name 'GitHub Action'
         git config --global user.email 'action@github.com'
         git add README.md
-        # Display the status to see if Git recognizes the changes
-        echo "Git status before commit:"
-        git status
-
-    - name: Commit and push if changes are detected
-      run: |
-        # Attempt to commit any changes
-        GIT_COMMIT=$(git commit -m "Automatically update badge query string" -a || echo "No changes to commit")
-        echo "$GIT_COMMIT"
-        # If changes were committed, push to the repository
-        if [[ "$GIT_COMMIT" != *"No changes to commit"* ]]; then
-          git push
-        else
-          echo "No changes detected, not pushing."
-        fi
+        git diff-index --quiet HEAD || git commit -m "Automatically update badge query string"
+        git push
