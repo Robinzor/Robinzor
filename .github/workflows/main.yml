@@ -2,8 +2,8 @@ name: Update Badge Query String
 
 on:
   schedule:
-    - cron: '0 */12 * * *' # This will run the Action every 12 hours; adjust as needed.
-  workflow_dispatch: # Allows manual trigger from the GitHub UI.
+    - cron: '0 */12 * * *'  # Runs every 12 hours
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   update-readme:
@@ -12,19 +12,39 @@ jobs:
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v2
-      
+
+    - name: Display the current README contents
+      run: cat README.md
+
     - name: Update README.md
       run: |
-        # Generate a unique query string. This example uses the current UNIX timestamp.
+        # Print the current UNIX timestamp, for diagnostic purposes
+        echo "Current UNIX timestamp: $(date +%s)"
+        # Generate a unique query string using the current UNIX timestamp
         UNIQUE_STRING=$(date +%s)
-        # Use sed to find and replace the query string in the badge URL in README.md.
-        # Make sure to adjust the pattern to match your specific badge URL structure.
+        # Update the README.md file with the new query string
         sed -i "s/Robinzor.png\?v=[0-9]*/Robinzor.png?v=${UNIQUE_STRING}/" README.md
-        
-    - name: Commit and push if changes are detected
+        # Print the modified README contents, to verify the sed operation
+        echo "Modified README.md contents:"
+        cat README.md
+
+    - name: Prepare for commit
       run: |
         git config --global user.name 'GitHub Action'
         git config --global user.email 'action@github.com'
         git add README.md
-        git commit -m "Automatically update badge query string" -a || echo "No changes to commit"
-        git push
+        # Display the status to see if Git recognizes the changes
+        echo "Git status before commit:"
+        git status
+
+    - name: Commit and push if changes are detected
+      run: |
+        # Attempt to commit any changes
+        GIT_COMMIT=$(git commit -m "Automatically update badge query string" -a || echo "No changes to commit")
+        echo "$GIT_COMMIT"
+        # If changes were committed, push to the repository
+        if [[ "$GIT_COMMIT" != *"No changes to commit"* ]]; then
+          git push
+        else
+          echo "No changes detected, not pushing."
+        fi
