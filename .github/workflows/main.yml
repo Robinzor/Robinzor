@@ -20,7 +20,7 @@ jobs:
         # Generate a unique query string using the current UNIX timestamp
         UNIQUE_STRING=$(date +%s)
         # Correctly update the README.md file with the new query string for the badge URL
-        sed -i "s/Robinzor.png\?version=[0-9]*/Robinzor.png?version=${UNIQUE_STRING}/" README.md
+        sed -i "s/Robinzor.png\?version=[0-9]\+/Robinzor.png?version=${UNIQUE_STRING}/" README.md
         # Print the modified README contents to verify the sed operation
         echo "Modified README.md contents:"
         cat README.md
