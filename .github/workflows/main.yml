@@ -1,0 +1,30 @@
+name: Update Badge Query String
+
+on:
+  schedule:
+    - cron: '0 */12 * * *' # This will run the Action every 12 hours; adjust as needed.
+  workflow_dispatch: # Allows manual trigger from the GitHub UI.
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+      
+    - name: Update README.md
+      run: |
+        # Generate a unique query string. This example uses the current UNIX timestamp.
+        UNIQUE_STRING=$(date +%s)
+        # Use sed to find and replace the query string in the badge URL in README.md.
+        # Make sure to adjust the pattern to match your specific badge URL structure.
+        sed -i "s/Robinzor.png\?v=[0-9]*/Robinzor.png?v=${UNIQUE_STRING}/" README.md
+        
+    - name: Commit and push if changes are detected
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add README.md
+        git commit -m "Automatically update badge query string" -a || echo "No changes to commit"
+        git push
