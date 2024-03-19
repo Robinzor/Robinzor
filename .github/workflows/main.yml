@@ -11,6 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./  # This points to your action defined in action.yml in the same repo
+      - uses: .github/workflows/action.yml@main
         with:
           username: "robinzor"
