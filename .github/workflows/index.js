@@ -1,63 +1,70 @@
-import { spawn } from 'child_process';
-import fetch from 'node-fetch';
-import * as core from '@actions/core';
-import * as fs from 'fs';
-import * as path from 'path';
+const { spawn } = require('child_process');
+const fetch = require('node-fetch');
+const core = require('@actions/core');
+const fs = require('fs');
 
 const FILEPATH = core.getInput("image_path");
 const THM_USERNAME = core.getInput("username");
-const COMMITTER_USERNAME = core.getInput('committer_username') || 'github-actions[bot]';
-const COMMITTER_EMAIL = core.getInput('committer_email') || 'github-actions[bot]@users.noreply.github.com';
-const COMMIT_MESSAGE = core.getInput('commit_message') || 'Update TryHackMe badge';
 
-// Utility to execute shell commands
-const execShellCommand = async (cmd, args = []) => {
-  const process = spawn(cmd, args, { stdio: 'pipe' });
-  let data = '';
-
-  process.stdout.on('data', (chunk) => data += chunk);
-  process.stderr.on('data', (chunk) => data += chunk);
-
-  return new Promise((resolve, reject) => {
-    process.on('exit', (code) => {
-      if (code === 0) resolve(data);
-      else reject(new Error(`Failed with code ${code}: ${data}`));
-    });
-  });
-};
-
-// Download and update the TryHackMe badge
-const updateTryHackMeBadge = async () => {
-  try {
-    const imagePath = path.join(process.cwd(), FILEPATH);
-    const imageURL = `https://tryhackme-badges.s3.amazonaws.com/${THM_USERNAME}.png`;
-
-    // Fetch and save the image
-    const response = await fetch(imageURL);
-    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
-    const stream = fs.createWriteStream(imagePath);
-    await new Promise((resolve, reject) => {
-      response.body.pipe(stream);
-      response.body.on('error', reject);
-      stream.on('finish', resolve);
-    });
-
-    // Git configuration
-    await execShellCommand('git', ['config', '--global', 'user.name', COMMITTER_USERNAME]);
-    await execShellCommand('git', ['config', '--global', 'user.email', COMMITTER_EMAIL]);
-
-    // Git operations
-    await execShellCommand('git', ['add', FILEPATH]);
-    try {
-      await execShellCommand('git', ['commit', '-m', COMMIT_MESSAGE]);
-      await execShellCommand('git', ['push']);
-    } catch (error) {
-      if (!error.message.includes('nothing to commit')) throw error;
-      console.log('No changes detected, skipping push.');
-    }
-  } catch (error) {
-    core.setFailed(`Action failed with error: ${error}`);
+/*
+ * Executes a command and returns its result as promise
+ * @param cmd {string} command to execute
+ * @param args {array} command line args
+ * @param options {Object} extra options
+ * @return {Promise<Object>}
+ */
+const exec = (cmd, args = [], options = {}) => new Promise((resolve, reject) => {
+  let outputData = '';
+  const optionsToCLI = {
+    ...options
+  };
+  if (!optionsToCLI.stdio) {
+    Object.assign(optionsToCLI, {stdio: ['inherit', 'inherit', 'inherit']});
   }
+  const app = spawn(cmd, args, optionsToCLI);
+  if (app.stdout) {
+    // Only needed for pipes
+    app.stdout.on('data', function (data) {
+      outputData += data.toString();
+    });
+  }
+
+  app.on('close', (code) => {
+    if (code !== 0) {
+      return reject({code, outputData});
+    }
+    return resolve({code, outputData});
+  });
+  app.on('error', () => reject({code: 1, outputData}));
+});
+
+const dlImg = async (filePath, username) => {
+  const url = `https://tryhackme-badges.s3.amazonaws.com/${username}.png`;
+  const path = filePath;
+  const committerUsername = core.getInput('committer_username');
+  const committerEmail = core.getInput('committer_email');
+  const commitMessage = core.getInput('commit_message');
+
+  const res = await fetch(url);
+  const fileStream = fs.createWriteStream(path);
+  await new Promise((resolve, reject) => {
+    res.body.pipe(fileStream);
+    res.body.on("error", reject);
+    fileStream.on("finish", resolve);
+  });
+
+  await exec('git', [
+    'config',
+    '--global',
+    'user.email',
+    committerEmail,
+  ]);
+  await exec('git', ['config', '--global', 'user.name', committerUsername]);
+  await exec('git', ['commit', '-m', commitMessage]);
+  await exec('git', ['add', filePath]);
+  await exec('git', ['push']);
 };
 
-updateTryHackMeBadge();
+dlImg(FILEPATH, THM_USERNAME).catch((error) => {
+  console.log('nothing to commit');
+});
