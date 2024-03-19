@@ -27,7 +27,7 @@ jobs:
           GITHUB_WORKSPACE: ${{ github.workspace }}
           username: 'Robinzor'
           commit_message: 'Add TryHackMe badge'
-        run: python tryhackme.py
+        run: python3 .github/workflows/tryhackme.py
 
       - name: Update README
         if: success()
