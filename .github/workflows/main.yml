@@ -32,7 +32,7 @@ jobs:
       - name: Update README
         if: success()
         run: |
-          awk '{gsub(/^!\[TryHackMe\].*$/, "![TryHackMe Badge](//raw/main/images/tryhackme.png)")}1' README.md > README_temp.md && mv README_temp.md README.md
+          awk '!/\[TryHackMe\]/ {print} /!\[TryHackMe\]/ {print "![TryHackMe Badge](Robinzor/.github/workflows/images/tryhackme.png)"}' README.md > README_temp.md && mv README_temp.md README.md
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
           git add README.md
