@@ -1,18 +1,14 @@
-const {spawn} = require('child_process');
+const { spawn } = require('child_process');
 const fetch = require('node-fetch');
 const core = require('@actions/core');
 const fs = require('fs');
 const path = require('path');
 
-const GITHUB_TOKEN = core.getInput("GITHUB_TOKEN");
 const FILEPATH = core.getInput("image_path");
 const THM_USERNAME = core.getInput("username");
 const COMMITTER_USERNAME = core.getInput('committer_username') || 'github-actions[bot]';
 const COMMITTER_EMAIL = core.getInput('committer_email') || 'github-actions[bot]@users.noreply.github.com';
 const COMMIT_MESSAGE = core.getInput('commit_message') || 'Update TryHackMe badge';
-
-// Set secret
-core.setSecret(GITHUB_TOKEN);
 
 // Utility to execute shell commands
 const execShellCommand = (cmd, args = []) => new Promise((resolve, reject) => {
