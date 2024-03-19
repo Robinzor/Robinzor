@@ -32,7 +32,7 @@ jobs:
       - name: Update README
         if: success()
         run: |
-          sed -i "s/^!\[TryHackMe\].*$/![TryHackMe Badge](${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}/raw/main/images/${{ env.username }}.png)/" README.md
+          sed -i "s/^!\[TryHackMe\].*$/![TryHackMe Badge](\/${{ env.GITHUB_REPOSITORY }}\/raw\/main\/images\/${{ env.username }}.png)/" README.md
           git add README.md
           git commit -m "Update TryHackMe badge in README"
           git push
