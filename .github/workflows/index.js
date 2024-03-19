@@ -1,8 +1,8 @@
-const { spawn } = require('child_process');
-const fetch = require('node-fetch');
-const core = require('@actions/core');
-const fs = require('fs');
-const path = require('path');
+import { spawn } from 'child_process';
+import fetch from 'node-fetch';
+import * as core from '@actions/core';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const FILEPATH = core.getInput("image_path");
 const THM_USERNAME = core.getInput("username");
@@ -11,17 +11,20 @@ const COMMITTER_EMAIL = core.getInput('committer_email') || 'github-actions[bot]
 const COMMIT_MESSAGE = core.getInput('commit_message') || 'Update TryHackMe badge';
 
 // Utility to execute shell commands
-const execShellCommand = (cmd, args = []) => new Promise((resolve, reject) => {
+const execShellCommand = async (cmd, args = []) => {
   const process = spawn(cmd, args, { stdio: 'pipe' });
   let data = '';
-  
+
   process.stdout.on('data', (chunk) => data += chunk);
   process.stderr.on('data', (chunk) => data += chunk);
-  
-  process.on('exit', (code) => {
-    if(code === 0) resolve(data); else reject(new Error(`Failed with code ${code}: ${data}`));
+
+  return new Promise((resolve, reject) => {
+    process.on('exit', (code) => {
+      if (code === 0) resolve(data);
+      else reject(new Error(`Failed with code ${code}: ${data}`));
+    });
   });
-});
+};
 
 // Download and update the TryHackMe badge
 const updateTryHackMeBadge = async () => {
@@ -42,7 +45,7 @@ const updateTryHackMeBadge = async () => {
     // Git configuration
     await execShellCommand('git', ['config', '--global', 'user.name', COMMITTER_USERNAME]);
     await execShellCommand('git', ['config', '--global', 'user.email', COMMITTER_EMAIL]);
-    
+
     // Git operations
     await execShellCommand('git', ['add', FILEPATH]);
     try {
