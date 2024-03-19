@@ -1,7 +1,6 @@
-import subprocess
 import requests
 import os
-import shutil
+import subprocess
 
 GITHUB_REPOSITORY = os.getenv("GITHUB_REPOSITORY")
 FILEPATH = os.getenv("image_path")
@@ -21,24 +20,33 @@ def exec_command(cmd, args=[], options={}):
         return {"code": 1, "outputData": str(e)}
     return {"code": process.returncode, "outputData": output_data}
 
-def dl_img(filepath, username):
+def download_image(filepath, username):
     url = f'https://tryhackme-badges.s3.amazonaws.com/{username}.png'
-    path = filepath
-
     with requests.get(url, stream=True) as response:
-        with open(path, 'wb') as file:
-            shutil.copyfileobj(response.raw, file)
+        with open(filepath, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
 
+def update_image(filepath):
+    # Check if the image exists in the repository
+    if os.path.exists(filepath):
+        # If it exists, overwrite it
+        exec_command('git', ['checkout', '--', filepath])
+    else:
+        # If it doesn't exist, add it
+        exec_command('git', ['add', filepath])
+
+def commit_and_push(username, commit_message):
+    exec_command('git', ['commit', '-m', commit_message])
+    exec_command('git', ['push', 'origin', 'HEAD'])
+
+try:
+    download_image(FILEPATH, THM_USERNAME)
+    update_image(FILEPATH)
     os.environ["GIT_COMMITTER_NAME"] = COMMITTER_USERNAME
     os.environ["GIT_COMMITTER_EMAIL"] = COMMITTER_EMAIL
     os.environ["GIT_AUTHOR_NAME"] = COMMITTER_USERNAME
     os.environ["GIT_AUTHOR_EMAIL"] = COMMITTER_EMAIL
-
-    exec_command('git', ['add', filepath])
-    exec_command('git', ['commit', '-m', COMMIT_MESSAGE])
-    exec_command('git', ['push', 'origin', 'HEAD'])
-
-try:
-    dl_img(FILEPATH, THM_USERNAME)
+    commit_and_push(THM_USERNAME, COMMIT_MESSAGE)
 except Exception as e:
     print('nothing to commit')
