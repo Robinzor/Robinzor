@@ -6,20 +6,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  tryhackme-badge-update:
-    name: Update TryHackMe badge
+  tryhackme:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          node-version: '20'
+          python-version: '3.x'
 
-      - name: Install dependencies
-        run: npm install node-fetch
+      - name: Install Dependencies
+        run: |
+          pip install requests
 
-      - name: Run script to update badge
-        run: node .github/workflows/index.js
+      - name: Run TryHackMe Script
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_WORKSPACE: ${{ github.workspace }}
+          username: 'Robinzor'
+          commit_message: 'Add TryHackMe badge'
+        run: python tryhackme.py
+
+      - name: Update README
+        if: success()
+        run: |
+          sed -i "s/^!\[TryHackMe\].*$/![TryHackMe Badge](${{ env.GITHUB_SERVER_URL }}/${{ env.GITHUB_REPOSITORY }}/raw/main/images/${{ env.username }}.png)/" README.md
+          git add README.md
+          git commit -m "Update TryHackMe badge in README"
+          git push 
