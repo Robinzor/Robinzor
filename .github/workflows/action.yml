@@ -1,0 +1,16 @@
+name: 'TryHackMe Badge Workflow'
+author: 'Robinzor'
+description: 'Updates your TryHackMe badge in README.'
+
+inputs:
+  username:
+    description: 'Your TryHackMe username.'
+    required: true
+
+runs:
+  using: 'node20'
+  main: 'index.js'
+
+branding:
+  icon: 'cloud-lightning'
+  color: 'red'
