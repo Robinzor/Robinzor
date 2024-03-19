@@ -1,47 +1,39 @@
 name: Update README Image
 
 on:
-  workflow_dispatch: # Enables manual trigger from GitHub UI
-  schedule:
-    - cron: '0 */6 * * *' # Every 6 hours
+  workflow_dispatch:
 
 jobs:
   update-readme-image:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3 # Updated to the latest version
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Node.js 20
-      uses: actions/setup-node@v3 # Updated to use Node.js 20
-      with:
-        node-version: '20' # Specify Node.js 20
-
-    - name: Fetch page content and decode base64 image
-      run: |
-        URL="https://tryhackme.com/badge/1604750"
-        # Fetch the content and extract the base64 encoded part
-        ENCODED_PART=$(curl -s $URL | grep -oP 'document\.write\(window\.atob\("\K[^"]+')
-        
-        # Decode and process to extract the image URL
-        DECODED_HTML=$(echo $ENCODED_PART | base64 --decode)
-        
-        # Assuming the DECODED_HTML contains an img src, extract it
-        # This step might require adjustment based on the actual HTML structure
-        IMAGE_URL=$(echo $DECODED_HTML | awk -F 'src="' '{print $2}' | awk -F '"' '{print $1}')
-        
-        echo "Extracted Image URL: $IMAGE_URL"
-        
-        # If IMAGE_URL is empty or not valid, you might not want to proceed with replacements
-        if [[ ! -z "$IMAGE_URL" && "$IMAGE_URL" =~ ^https ]]; then
-          # Update README.md with the new image URL
-          sed -i "s|https://tryhackme-badges.s3.amazonaws.com/Robinzor.png.*|![TryHackMe]($IMAGE_URL)|" README.md
+      - name: Fetch and decode image, update README
+        run: |
+          # Fetch the encoded data from the page
+          ENCODED_DATA=$(curl -s 'https://tryhackme.com/badge/1604750' | grep -oP 'window\.atob\("\K[^"]+' | head -1)
           
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
-          git add README.md
-          git commit -m "Update README with new TryHackMe badge image" || echo "No changes to commit"
-          git push
-        else
-          echo "Valid image URL not extracted, skipping update."
+          # Decode the data to get the HTML snippet
+          DECODED_HTML=$(echo $ENCODED_DATA | base64 --decode)
+          
+          # Extract image URL from the HTML snippet
+          # This assumes the image URL is in the extracted HTML in a predictable format
+          IMAGE_URL=$(echo $DECODED_HTML | grep -oP 'https://[^"]+\.png' | head -1)
+          
+          # Check if IMAGE_URL is not empty
+          if [[ -n "$IMAGE_URL" ]]; then
+            # Replace the existing image URL in README.md
+            # Adjust the sed pattern to match how the image is referenced in your README
+            sed -i "s|https://tryhackme-badges.s3.amazonaws.com/Robinzor.png.*|![$IMAGE_URL]($IMAGE_URL)|" README.md
+            
+            # Commit and push changes
+            git config --global user.name 'GitHub Action'
+            git config --global user.email 'action@github.com'
+            git add README.md
+            git commit -m "Update TryHackme Badge Image" || echo "No changes to update"
+            git push
+          else
+            echo "Failed to extract image URL"
