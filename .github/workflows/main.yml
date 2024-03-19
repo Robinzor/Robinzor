@@ -1,39 +1,17 @@
-name: Update README Image
+name: TryHackMe Update Badge
 
 on:
+  schedule:
+    - cron: '0 */12 * * *'
   workflow_dispatch:
-
 jobs:
-  update-readme-image:
+  tryhackme-badge-update:
+    name: Update TryHackMe badge
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Fetch and decode image, update README
-        run: |
-          # Fetch the encoded data from the page
-          ENCODED_DATA=$(curl -s 'https://tryhackme.com/badge/1604750' | grep -oP 'window\.atob\("\K[^"]+' | head -1)
-          
-          # Decode the data to get the HTML snippet
-          DECODED_HTML=$(echo $ENCODED_DATA | base64 --decode)
-          
-          # Extract image URL from the HTML snippet
-          # This assumes the image URL is in the extracted HTML in a predictable format
-          IMAGE_URL=$(echo $DECODED_HTML | grep -oP 'https://[^"]+\.png' | head -1)
-          
-          # Check if IMAGE_URL is not empty
-          if [[ -n "$IMAGE_URL" ]]; then
-            # Replace the existing image URL in README.md
-            # Adjust the sed pattern to match how the image is referenced in your README
-            sed -i "s|https://tryhackme-badges.s3.amazonaws.com/Robinzor.png.*|![$IMAGE_URL]($IMAGE_URL)|" README.md
-            
-            # Commit and push changes
-            git config --global user.name 'GitHub Action'
-            git config --global user.email 'action@github.com'
-            git add README.md
-            git commit -m "Update TryHackme Badge Image" || echo "No changes to update"
-            git push
-          else
-            echo "Failed to extract image URL"
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          # Replace with your tryhackme username
+          username: "robinzor"
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
