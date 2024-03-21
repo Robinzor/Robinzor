@@ -16,8 +16,9 @@ jobs:
     - name: Update README.md with AWK
       run: |
         RANDOM_STRING=$(openssl rand -hex 8)
-        awk -v random="$RANDOM_STRING" '{ gsub(/tryhackme-badge-workflow\/main\/badge\.png\?version=[0-9a-fA-F]+/, "tryhackme-badge-workflow/main/badge.png?version=" random); print }' README.md > temp_README.md && mv temp_README.md README.md
+        awk -v random="$RANDOM_STRING" '{ gsub(/(https:\/\/raw\.githubusercontent\.com\/Robinzor\/tryhackme-badge-workflow\/main\/badge\.png\?version=)[0-9a-fA-F]+/, "https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png?version=" random); print }' README.md > temp_README.md && mv temp_README.md README.md
         cat README.md
+
 
     - name: Commit and push if changes are detected
       run: |
