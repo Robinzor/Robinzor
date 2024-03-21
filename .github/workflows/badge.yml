@@ -2,8 +2,8 @@ name: Update Badge
 
 on:
   schedule:
-    - cron: '0 1 * * *'  # Runs every 12 hours
-  workflow_dispatch:  # Allows manual trigger
+    - cron: '0 1 * * *'
+  workflow_dispatch: 
 
 jobs:
   update-readme:
