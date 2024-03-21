@@ -2,7 +2,7 @@ name: Update Badge
 
 on:
   schedule:
-    - cron: '0 1 * * *'
+    - cron: '0 1 * * *'  # Runs every 12 hours
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
@@ -15,13 +15,10 @@ jobs:
       
     - name: Update README.md with AWK
       run: |
-        # Generate a random string
         RANDOM_STRING=$(openssl rand -hex 8)
-        # Use awk to update the README.md file with the new query string for the badge URL
-        awk -v random="$RANDOM_STRING" '{ gsub(/tryhackme-badge-workflow\/main\/badge\.png\?version=[0-9a-fA-F]+/, "tryhackme-badge-workflow/main/badge.png?version="random); print }' README.md > temp_README.md && mv temp_README.md README.md
-        # Display the modified README contents to verify the operation
+        awk -v random="$RANDOM_STRING" '{ gsub(/tryhackme-badge-workflow\/main\/badge\.png\?version=[0-9a-fA-F]+/, "tryhackme-badge-workflow/main/badge.png?version=" random); print }' README.md > temp_README.md && mv temp_README.md README.md
         cat README.md
-        
+
     - name: Commit and push if changes are detected
       run: |
         git config --global user.name 'GitHub Action'
