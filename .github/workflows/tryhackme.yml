@@ -1,40 +1,29 @@
-name: TryHackMe Badge
+name: Update README with Badge
 
 on:
-  schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    paths:
+      - 'badge.png'
 
 jobs:
-  convert:
+  update-readme:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install Google Chrome
+      - name: Update README
         run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+          # Copy the latest badge.png to the root directory
+          cp badge.png $GITHUB_WORKSPACE/badge.png
 
-      - name: Install Dependencies
-        run: npm install puppeteer
+          # Update the README with the latest badge
+          sed -i 's|!\[TryHackMe Badge\](badge.png)|\!\[TryHackMe Badge\](https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png)|g' $GITHUB_WORKSPACE/README.md
 
-      - name: Capture Screenshot
-        run: node capture-screenshot.js
-
-      - name: Commit screenshot
-        run: |
+          # Commit and push the changes
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add -f badge.png
-          git commit -m "Add generated badge screenshot" -a || echo "No changes to commit"
+          git add badge.png README.md
+          git commit -m "Update README with latest badge" || echo "No changes to commit"
           git push
