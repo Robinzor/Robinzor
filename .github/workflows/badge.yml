@@ -17,8 +17,8 @@ jobs:
       run: |
         # Generate a unique query string using the current UNIX timestamp
         UNIQUE_STRING=$(date +%s)
-        # Use awk to update the README.md file with the new query string for the badge URL
-        awk -v unique="$UNIQUE_STRING" '{ gsub(/badge\.png\?version=[0-9]+/, "badge.png?version="unique); print }' README.md > temp_README.md && mv temp_README.md README.md
+        # Use awk to update the README.md file with the new badge URL
+        awk -v unique="$UNIQUE_STRING" '{ if ($0 ~ /!\[TryHackMe Badge\]/) { print "![TryHackMe Badge](https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png?version=" unique ")" } else { print } }' README.md > temp_README.md && mv temp_README.md README.md
         # Display the modified README contents to verify the operation
         cat README.md
         
