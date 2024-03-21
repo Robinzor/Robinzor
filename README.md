@@ -3,3 +3,6 @@
 - 💞️ I’m looking to collaborate on some intresting projects.
 - 📲 Free browserbased [QRcode decoder](https://robinzor.nl/qr) 🚀!
 
+![TryHackMe Badge](https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png)
+
+
