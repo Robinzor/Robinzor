@@ -5,8 +5,8 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 jobs:
-  tryhackme-badge-update:
-    name: Update this repo's tryhackme badge with the latest tryhackme image badge
+  tryhackme:
+    name: Update this Repo with TryHackMe Badge
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
