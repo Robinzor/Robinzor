@@ -3,7 +3,7 @@ name: Update Badge
 on:
   schedule:
     - cron: '0 1 * * *'
-  workflow_dispatch: 
+  workflow_dispatch:
 
 jobs:
   update-readme:
@@ -15,14 +15,17 @@ jobs:
       
     - name: Update README.md with AWK
       run: |
-        RANDOM_STRING=$(openssl rand -hex 8)
-        awk -v random="$RANDOM_STRING" '{ sub(/(https:\/\/raw\.githubusercontent\.com\/Robinzor\/tryhackme-badge-workflow\/main\/badge\.png\?version=)[0-9a-fA-F]*/, "https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png?version=" random); print }' README.md > temp_README.md && mv temp_README.md README.md
+        # Generate a unique query string using the current UNIX timestamp
+        UNIQUE_STRING=$(date +%s)
+        # Use awk to update the README.md file with the new query string for the badge URL
+        awk -v unique="$UNIQUE_STRING" '{ gsub(/Robinzor\.png\?version=[0-9]+/, "Robinzor.png?version="unique); print }' README.md > temp_README.md && mv temp_README.md README.md
+        # Display the modified README contents to verify the operation
         cat README.md
-
+        
     - name: Commit and push if changes are detected
       run: |
         git config --global user.name 'GitHub Action'
         git config --global user.email 'action@github.com'
         git add README.md
-        git diff-index --quiet HEAD || git commit -m "Automatically update badge query string with AWK"
+        git diff-index --quiet HEAD || git commit -m "Auto Refresh"
         git push
