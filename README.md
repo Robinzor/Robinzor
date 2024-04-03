@@ -4,6 +4,6 @@
 - 📲 Free web-based [QR Code Decoder](https://robinzor.nl/qr) 🚀!
 </br>
 
-![TryHackMe Badge](https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png?version=1712022840)
+![TryHackMe Badge](https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png?version=1712109079)
 
 
