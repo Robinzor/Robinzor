@@ -4,7 +4,7 @@
 
 - **[QR Code Decoder](https://robinzor.nl/qr)**: A user-friendly tool for decoding QR codes, operating entirely in your browser for maximum privacy.
 
-- **[Hasher](https://robinzor.nl/hash)**: Perform integrity checks with ease. This tool supports file hash generation and comparison, including the advanced SSDEEP algorithm, without any server-side processing.
+- **[Hasher](https://robinzor.nl/hash)**: Perform integrity checks with ease. This tool supports file hash generation, including the advanced SSDEEP algorithm, without any server-side processing.
 
 ### Privacy First:
 Both tools are designed with privacy in mind, processing data locally in your browser and not making any external requests. 
