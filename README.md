@@ -1,8 +1,5 @@
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=2BDF04&random=false&width=435&lines=Hi%2C+I+am+Robinzor!)](https://git.io/typing-svg)
 
-- 👀 **Passionate about Cyber Security**: I dedicate my time to improving online safety and privacy.
-- 💞️ **Open to Collaboration**: Always interested in joining forces on innovative projects within the cyber security space.
-
 ### Tools Developed:
 
 - **[QR Code Decoder](https://robinzor.nl/qr)**: A user-friendly tool for decoding QR codes, operating entirely in your browser for maximum privacy.
