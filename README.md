@@ -3,7 +3,7 @@
 - 👀 **Passionate about Cyber Security**: I dedicate my time to improving online safety and privacy.
 - 💞️ **Open to Collaboration**: Always interested in joining forces on innovative projects within the cyber security space.
 
-## Tools Developed for Privacy and Security:
+## Tools Developed:
 
 - **[QR Code Decoder](https://robinzor.nl/qr)**: A user-friendly tool for decoding QR codes, operating entirely in your browser for maximum privacy.
 
