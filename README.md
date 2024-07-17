@@ -9,7 +9,7 @@
 ### Privacy first:
 Both tools are designed with privacy in mind, processing data locally in your browser and not making any external requests. 
 
-![TryHackMe Badge](https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png?version=1721095482)
+![TryHackMe Badge](https://raw.githubusercontent.com/Robinzor/tryhackme-badge-workflow/main/badge.png?version=1721181845)
 
 
 
